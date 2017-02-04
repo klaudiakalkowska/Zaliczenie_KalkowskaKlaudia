@@ -1,0 +1,55 @@
+# -*- coding: utf-8 -*-
+
+
+import sqlite3
+import repository
+import unittest
+
+db_path = 'zaliczenie1.db'
+
+class RepositoryTest(unittest.TestCase):
+
+    def setUp(self):
+        conn = sqlite3.connect(db_path)
+        c = conn.cursor()
+        c.execute('DELETE FROM Pozycje')
+        c.execute('DELETE FROM Karta')
+        c.execute('''INSERT INTO Karta (id, inv_date, amount) VALUES(4, '2016-01-01', 15)''')
+        c.execute('''INSERT INTO Pozycje (author, title, kind,  qty, karta_id) VALUES("Joanna Chmielewska","Krokody z kraju Karoliny","kryminal",3,5)''')
+        c.execute('''INSERT INTO Pozycje (author, title, kind, qty, karta_id) VALUES("Linus Reichlin","Tesknota atomow","kryminal",3,5)''')
+
+        c.execute('''INSERT INTO Pozycje (author,title,kind, qty, karta_id) VALUES("Roz Bailey","Imprezowe dziewczyny","komedia",3,2)''')
+        c.execute('''INSERT INTO Pozycje (author, title, kind, qty, karta_id) VALUES("Cecelia Ahern","Love, Rosie","komedia",3,2)''')
+
+        conn.commit()
+        conn.close()
+
+    def tearDown(self):
+        conn = sqlite3.connect(db_path)
+        c = conn.cursor()
+        c.execute('DELETE FROM Pozycje')
+        c.execute('DELETE FROM Karta')
+        conn.commit()
+        conn.close()
+
+    def testGetByIdInstance(self):
+        karta = repository.KartaRepository().getById(1)
+        self.assertIsInstance(karta, repository.Karta,
+        "Obiekt nie jest klasy Karta")
+
+    def testGetByIdNotFound(self):
+        self.assertEqual(repository.KartaRepository().getById(22),
+                None, "Powinno wyjść None")
+
+    def testGetByIdInvitemsLen(self):
+        self.assertEqual(len(repository.KartaRepository().getById(1).pozycje),
+                2,"Powinno wyjść 2")
+
+    def testDeleteNotFound(self):
+        self.assertRaises(repository.RepositoryException,
+                repository.KartaRepository().delete, 22)
+
+
+
+if __name__ == "__main__":
+    unittest.main()
