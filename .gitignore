@@ -1,0 +1,29 @@
+# -*- coding: utf-8 -*-
+
+import sqlite3
+
+
+db_path = 'zaliczenie1.db'
+conn = sqlite3.connect(db_path)
+
+c = conn.cursor()
+#
+# Tabele
+#
+c.execute('''
+          CREATE TABLE Karta
+          ( id INTEGER PRIMARY KEY,
+            inv_date DATE NOT NULL,
+            amount NUMERIC NOT NULL
+          )
+          ''')
+c.execute('''
+          CREATE TABLE Pozycje
+          ( author VARCHAR(100),
+            title VARCHAR (200),
+            kind VARCHAR (50),
+            qty INTEGER NOT NULL,
+            karta_id INTEGER,
+           FOREIGN KEY(karta_id) REFERENCES Karta(id),
+           PRIMARY KEY (author, karta_id))
+          ''')
